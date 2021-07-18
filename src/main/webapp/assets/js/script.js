@@ -96,13 +96,13 @@ async function post(obj) {
 
 async function getAllTasks(all) {
     try {
-        const response = await fetch(url + 'todoServlet');
+        const response = await fetch(url + 'todoServlet?' + new URLSearchParams(`all=${all}`));
         if (response.ok) {
             tasksArray = [];
             const tasks = await response.json();
             tasksArray.push(...tasks);
             console.log(tasksArray);
-            showAllTasks(all);
+            showAllTasks();
         } else {
             throw new Error("Bad response from server");
         }
@@ -111,15 +111,9 @@ async function getAllTasks(all) {
     }
 }
 
-function showAllTasks(all) {
+function showAllTasks() {
     tasksContainer.innerHTML = '';
-    let array;
-    if (all) {
-        array = tasksArray;
-    } else {
-        array = tasksArray.filter((e) => e.done == false);
-    }
-    array.forEach((e) => {
+    tasksArray.forEach((e) => {
         const div = document.createElement('div');
         div.classList.add('d-flex', 'flex-row',
             'justify-content-center',

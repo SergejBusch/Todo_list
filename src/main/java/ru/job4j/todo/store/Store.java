@@ -8,5 +8,8 @@ public interface Store {
 
     Collection<Item> getAllTasks();
 
+    Collection<Item> getUnfinishedTasks();
+
     void saveOrUpdate(Item item);
+
 }
