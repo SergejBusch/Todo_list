@@ -5,9 +5,9 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://127.0.0.1:5432/todo</property>
-        <property name="hibernate.connection.username">postgres</property>
-        <property name="hibernate.connection.password">postgres</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://ec2-52-19-96-181.eu-west-1.compute.amazonaws.com:5432/d9d0lnj8ctgsqf?sslmode=require</property>
+        <property name="hibernate.connection.username">gxnphnotwuarbm</property>
+        <property name="hibernate.connection.password">4db788f58a378006a10a240f2f6f3df0ed1576ff4ecd90af8ab34544fa60194d</property>
         <property name="hibernate.connection.pool_size">1</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
@@ -19,5 +19,6 @@
         <property name="use_sql_comments">true</property>
 
         <mapping class="ru.job4j.todo.model.Item" />
+        <mapping class="ru.job4j.todo.model.UserItem" />
     </session-factory>
 </hibernate-configuration>

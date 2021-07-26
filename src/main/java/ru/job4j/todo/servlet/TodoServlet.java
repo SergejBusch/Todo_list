@@ -3,6 +3,7 @@ package ru.job4j.todo.servlet;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.UserItem;
 import ru.job4j.todo.store.HbnStore;
 
 import javax.servlet.http.HttpServlet;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Enumeration;
+import java.util.List;
 
 public class TodoServlet extends HttpServlet {
 
@@ -26,12 +27,13 @@ public class TodoServlet extends HttpServlet {
         String everything = sb.toString();
         System.out.println(everything);
         var jsonObj = JsonParser.parseString(everything).getAsJsonObject();
-        var item = new Item(jsonObj.get("id").getAsInt(),
+        var item = new Item(
+                jsonObj.get("id").getAsInt(),
                 jsonObj.get("name").getAsString(),
                 jsonObj.get("description").getAsString(),
                 new Timestamp(System.currentTimeMillis()),
-                jsonObj.get("done").getAsBoolean()
-                );
+                jsonObj.get("done").getAsBoolean(),
+                (UserItem) req.getSession().getAttribute("user"));
         HbnStore.instOf().saveOrUpdate(item);
     }
 
@@ -39,16 +41,18 @@ public class TodoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
+        var user = ((UserItem) req.getSession().getAttribute("user"));
         boolean all = Boolean.parseBoolean(req.getParameter("all"));
         Collection<Item> todos;
         if (all) {
-            todos = HbnStore.instOf().getAllTasks();
+            todos = HbnStore.instOf().getAllTasks(user.getId());
         } else {
-            todos = HbnStore.instOf().getUnfinishedTasks();
+            todos = HbnStore.instOf().getUnfinishedTasks(user.getId());
         }
         var json = new Gson().toJson(todos);
+        var email = new Gson().toJson(user.getEmail());
         var writer = resp.getWriter();
-        writer.print(json);
+        writer.print(List.of(json, email));
         writer.flush();
     }
 }

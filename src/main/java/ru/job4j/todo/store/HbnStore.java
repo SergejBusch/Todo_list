@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.boot.registry.StandardServiceRegistry;
+import ru.job4j.todo.model.UserItem;
 
 public class HbnStore implements Store, AutoCloseable {
 
@@ -34,24 +35,44 @@ public class HbnStore implements Store, AutoCloseable {
     }
 
     @Override
-    public Collection<Item> getAllTasks() {
+    public Collection<Item> getAllTasks(int id) {
         System.out.println("it work");
         return this.tx(
-                session -> session.createQuery("from Item ").list()
+                session -> session.createQuery("from Item i where i.userItem.id = :id")
+                        .setParameter("id", id)
+                        .list()
         );
     }
 
     @Override
-    public Collection<Item> getUnfinishedTasks() {
+    public Collection<Item> getUnfinishedTasks(int id) {
         System.out.println("it work too");
         return this.tx(
-                session -> session.createQuery("from Item i where i.done = false").list()
+                session -> session.createQuery("from Item i where i.done = false and i.userItem.id = :id")
+                        .setParameter("id", id)
+                        .list()
         );
     }
 
     @Override
     public void saveOrUpdate(Item item) {
         this.txVoid(session -> session.saveOrUpdate(item));
+    }
+
+    @Override
+    public UserItem getUserByEmail(String email) {
+        var userItem =  this.tx(s -> s.createQuery(
+                "from UserItem u where u.email = :email", UserItem.class)
+                .setParameter("email", email)
+                .getResultList().stream().findFirst().orElse(null));
+
+        System.out.println(userItem);
+        return userItem;
+    }
+
+    @Override
+    public void saveOrUpdate(UserItem userItem) {
+        this.txVoid(session -> session.saveOrUpdate(userItem));
     }
 
     private <T> T tx(final Function<Session, T> command) {

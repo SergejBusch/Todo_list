@@ -15,12 +15,17 @@ public class Item {
     private Timestamp created;
     private boolean done;
 
-    public Item(int id, String name, String description, Timestamp created, boolean done) {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserItem userItem;
+
+    public Item(int id, String name, String description, Timestamp created, boolean done, UserItem userItem) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.created = created;
         this.done = done;
+        this.userItem = userItem;
     }
 
     public Item() {
@@ -71,6 +76,14 @@ public class Item {
         this.done = done;
     }
 
+    public UserItem getUserItem() {
+        return userItem;
+    }
+
+    public void setUserItem(UserItem userItem) {
+        this.userItem = userItem;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -88,7 +101,7 @@ public class Item {
         if (done != item.done) {
             return false;
         }
-        if (name != null ? !name.equals(item.name) : item.name != null) {
+        if (!Objects.equals(name, item.name)) {
             return false;
         }
         if (!Objects.equals(description, item.description)) {

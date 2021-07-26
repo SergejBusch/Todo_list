@@ -3,7 +3,9 @@ const taskLabel = document.querySelector('.task-desc');
 const tasksContainer = document.querySelector('.tasks-container');
 const completeShowCheckbox = document.querySelector('.form-check-input');
 const form = document.querySelector('form');
-const url = 'http://localhost:8080/todo/';
+const parName = document.querySelector('.name');
+const logout = document.querySelector('.logout');
+// const url = 'http://localhost:8080/todo/';
 let tasksArray = [];
 
 completeShowCheckbox.addEventListener('change', function() {
@@ -18,9 +20,13 @@ tasksContainer.addEventListener("contextmenu", (event) => {
     event.preventDefault();
 });
 
+logout.addEventListener('click', () => {
+    logOut();
+});
+
 tasksContainer.addEventListener("mousedown", (event) => {
     event.preventDefault();
-    if (event.button === 2) {
+    // if (event.button === 2) {
         console.log('mouse2');
         console.log(event.target);
         if (event.target.classList.contains('task-todo')) {
@@ -33,7 +39,7 @@ tasksContainer.addEventListener("mousedown", (event) => {
             event.target.dataset.done = false;
             post(event.target);
         }
-    }
+    // }
 });
 
 btnAdd.addEventListener('click', ()=> submitAction());
@@ -80,7 +86,7 @@ async function post(obj) {
                 done: task.done,
             })
         };
-        const response = await fetch(url + 'todoServlet', config);
+        const response = await fetch('/to.do', config);
         if (response.ok) {
             console.log('response ok')
             getAllTasks(completeShowCheckbox.checked);
@@ -90,24 +96,47 @@ async function post(obj) {
             }
         }
     } catch (e) {
-        console.error(e);
+        console.log(e);
+    }
+}
+
+function setName(uName) {
+    parName.innerHTML = `Logged in as ${uName}`;
+}
+
+function logOut() {
+    asyncLogOut();
+}
+
+async function asyncLogOut() {
+    try {
+        const response = await fetch('/logout');
+        if (response.ok) {
+            document.location.href = response.url;
+        } else {
+            throw new Error("Bad response from server");
+        }
+    } catch (e) {
+        console.log(e);
     }
 }
 
 async function getAllTasks(all) {
     try {
-        const response = await fetch(url + 'todoServlet?' + new URLSearchParams(`all=${all}`));
+        const response = await fetch('/to.do?' + new URLSearchParams(`all=${all}`));
+        console.log(response.status);
         if (response.ok) {
             tasksArray = [];
             const tasks = await response.json();
-            tasksArray.push(...tasks);
-            console.log(tasksArray);
+            console.log(tasks);
+            tasksArray.push(...tasks[0]);
+            setName(tasks[1]);
             showAllTasks();
         } else {
             throw new Error("Bad response from server");
         }
     } catch (e) {
-        console.error(e);
+        console.log(e);
     }
 }
 
@@ -138,3 +167,5 @@ function showAllTasks() {
 }
 
 getAllTasks(completeShowCheckbox.checked);
+
+console.log(sessionStorage.getItem('user'));
