@@ -8,6 +8,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.todo.model.Item;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -61,13 +62,11 @@ public class HbnStore implements Store, AutoCloseable {
 
     @Override
     public UserItem getUserByEmail(String email) {
-        var userItem =  this.tx(s -> s.createQuery(
+        var userItem = this.tx(s -> s.createQuery(
                 "from UserItem u where u.email = :email", UserItem.class)
                 .setParameter("email", email)
-                .getResultList().get(0));
-
-        System.out.println(userItem);
-        return userItem;
+                .getResultList());
+        return userItem.size() > 0 ? userItem.get(0) : null;
     }
 
     @Override

@@ -35,22 +35,9 @@ public class RegServlet extends HttpServlet {
             HttpSession sc = req.getSession();
             sc.setAttribute("user", user);
             resp.sendRedirect(req.getContextPath() + "/index.html");
-            return;
-//            new RedirectionServlet().doGet(req, resp);
-//            System.out.println(req.getServletPath());
-//            getServletConfig()
-//                    .getServletContext().getRequestDispatcher("/redir.do").include(req, resp);
-//            req.getRequestDispatcher("/WEB-INF/test.html").forward(req, resp);
-
-//            resp.setStatus(302);
-//            resp.setContentType("text/html");
-//            resp.setHeader("Location", req.getContextPath() + "/index.html");
-//            resp.setHeader("Connection", "close");
-//            resp.sendRedirect(req.getContextPath() + "/redir.do");
         } else {
             req.setAttribute("error", "User with this email is already registered");
             req.getRequestDispatcher("register.html").forward(req, resp);
         }
-        return;
     }
 }

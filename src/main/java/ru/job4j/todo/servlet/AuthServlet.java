@@ -28,7 +28,6 @@ public class AuthServlet extends HttpServlet {
             HttpSession sc = req.getSession();
             sc.setAttribute("user", user);
             resp.sendRedirect(req.getContextPath() + "/index.html");
-            System.out.println(req.getContextPath());
         } else {
             req.setAttribute("error", "Wrong email or password");
             req.getRequestDispatcher("login.html").forward(req, resp);
