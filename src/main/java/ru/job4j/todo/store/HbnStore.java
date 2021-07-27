@@ -64,7 +64,7 @@ public class HbnStore implements Store, AutoCloseable {
         var userItem =  this.tx(s -> s.createQuery(
                 "from UserItem u where u.email = :email", UserItem.class)
                 .setParameter("email", email)
-                .getResultList().stream().findFirst().orElse(null));
+                .getResultList().get(0));
 
         System.out.println(userItem);
         return userItem;

@@ -15,22 +15,9 @@ public class RedirectionServlet extends HttpServlet {
             System.out.println(disp);
             disp.forward(req, resp);
         } else {
-//            resp.setStatus(307);
-//            resp.setContentType("document/Redirect");
-//            resp.setHeader("Location", "index.html");
-
-//            resp.setCharacterEncoding("UTF-8");
-//            var url = resp.encodeRedirectURL("index.html");
-//            resp.setStatus(302);
-//            resp.setContentType("text/html;charset=UTF-8");
-//            resp.setHeader("Location", url);
-//            System.out.println("index go");
             var disp = req.getRequestDispatcher("index.html");
             System.out.println(disp);
             disp.forward(req, resp);
-//            resp.sendRedirect(req.getContextPath() + "/index.html");
-//            System.out.println("auch da");
         }
-        return;
     }
 }
