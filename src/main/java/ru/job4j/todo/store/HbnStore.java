@@ -5,10 +5,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -37,19 +37,17 @@ public class HbnStore implements Store, AutoCloseable {
 
     @Override
     public Collection<Item> getAllTasks(int id) {
-        System.out.println("it work");
         return this.tx(
-                session -> session.createQuery("from Item i where i.userItem.id = :id")
+                session -> session.createQuery("select distinct i from Item i join fetch i.categories where i.userItem.id = :id")
                         .setParameter("id", id)
-                        .list()
-        );
+                        .list());
     }
 
     @Override
     public Collection<Item> getUnfinishedTasks(int id) {
-        System.out.println("it work too");
         return this.tx(
-                session -> session.createQuery("from Item i where i.done = false and i.userItem.id = :id")
+                session -> session.createQuery("select distinct i from Item i join fetch i.categories " +
+                            "where i.userItem.id = :id and i.done = false")
                         .setParameter("id", id)
                         .list()
         );
@@ -72,6 +70,20 @@ public class HbnStore implements Store, AutoCloseable {
     @Override
     public void saveOrUpdate(UserItem userItem) {
         this.txVoid(session -> session.saveOrUpdate(userItem));
+    }
+
+    @Override
+    public Collection<Category> getAllCategories() {
+        return this.tx(s -> s.createQuery("from Category").list());
+
+    }
+
+    @Override
+    public Category findById(int id) {
+        var category = this.tx(session -> session.createQuery("from Category c where c.id = :id", Category.class)
+                .setParameter("id", id)
+                .getResultList());
+        return category.size() > 0 ? category.get(0) : null;
     }
 
     private <T> T tx(final Function<Session, T> command) {

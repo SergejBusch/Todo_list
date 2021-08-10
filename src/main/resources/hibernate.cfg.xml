@@ -20,5 +20,6 @@
 
         <mapping class="ru.job4j.todo.model.Item" />
         <mapping class="ru.job4j.todo.model.UserItem" />
+        <mapping class="ru.job4j.todo.model.Category" />
     </session-factory>
 </hibernate-configuration>

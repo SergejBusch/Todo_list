@@ -5,8 +5,10 @@ const completeShowCheckbox = document.querySelector('.form-check-input');
 const form = document.querySelector('form');
 const parName = document.querySelector('.name');
 const logout = document.querySelector('.logout');
-// const url = 'http://localhost:8080/todo/';
+const selectGroup = document.querySelector('.opt-group');
+const formSelect = document.querySelector('.form-select');
 let tasksArray = [];
+let categoriesArray = [];
 
 completeShowCheckbox.addEventListener('change', function() {
     if (this.checked) {
@@ -18,6 +20,10 @@ completeShowCheckbox.addEventListener('change', function() {
 
 tasksContainer.addEventListener("contextmenu", (event) => {
     event.preventDefault();
+});
+
+formSelect.addEventListener('click', evt => {
+    console.log(formSelect.selectedOptions)
 });
 
 logout.addEventListener('click', () => {
@@ -60,14 +66,20 @@ function submitAction() {
 
 async function post(obj) {
     try {
+        if (formSelect.selectedOptions.length < 1) {
+            alert('Please select Category');
+            return;
+        }
         let task = {
             id: 0,
             name: taskLabel.value.split(' ')[0],
             description: taskLabel.value,
             done: false,
+            categories: [],
         };
+        let selects = [...formSelect.selectedOptions]
+            .map(option => option.value);
         if (obj != null) {
-            console.log(obj.dataset.id);
             task.id = parseInt(obj.dataset.id);
             task.name = obj.dataset.name;
             task.description = obj.dataset.desc;
@@ -84,6 +96,7 @@ async function post(obj) {
                 name: task.name,
                 description: task.description,
                 done: task.done,
+                categories: selects,
             })
         };
         const response = await fetch('/to.do', config);
@@ -121,14 +134,38 @@ async function asyncLogOut() {
     }
 }
 
+async function getAllCategories() {
+    try {
+        const response = await fetch('/categories.do');
+        if (response.ok) {
+            categoriesArray = [];
+            const categories = await response.json();
+            console.log(categoriesArray);
+            categoriesArray.push(...categories);
+            addCategories();
+            getAllTasks(completeShowCheckbox.checked);
+        } else {
+            throw new Error("Bad response from server");
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+function addCategories() {
+    selectGroup.innerHTML = '';
+    console.log(categoriesArray);
+    categoriesArray.forEach(c => {
+        selectGroup.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+    });
+}
+
 async function getAllTasks(all) {
     try {
         const response = await fetch('/to.do?' + new URLSearchParams(`all=${all}`));
-        console.log(response.status);
         if (response.ok) {
             tasksArray = [];
             const tasks = await response.json();
-            console.log(tasks);
             tasksArray.push(...tasks[0]);
             setName(tasks[1]);
             showAllTasks();
@@ -166,6 +203,6 @@ function showAllTasks() {
     });
 }
 
-getAllTasks(completeShowCheckbox.checked);
+getAllCategories();
 
-console.log(sessionStorage.getItem('user'));
+

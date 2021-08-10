@@ -1,7 +1,9 @@
 package ru.job4j.todo.servlet;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.UserItem;
 import ru.job4j.todo.store.HbnStore;
@@ -11,8 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TodoServlet extends HttpServlet {
 
@@ -27,13 +32,16 @@ public class TodoServlet extends HttpServlet {
         String everything = sb.toString();
         System.out.println(everything);
         var jsonObj = JsonParser.parseString(everything).getAsJsonObject();
+        var array = getCategories(jsonObj.get("categories").getAsJsonArray());
         var item = new Item(
                 jsonObj.get("id").getAsInt(),
                 jsonObj.get("name").getAsString(),
                 jsonObj.get("description").getAsString(),
                 new Timestamp(System.currentTimeMillis()),
                 jsonObj.get("done").getAsBoolean(),
-                (UserItem) req.getSession().getAttribute("user"));
+                (UserItem) req.getSession().getAttribute("user"),
+                array);
+        System.out.println(array);
         HbnStore.instOf().saveOrUpdate(item);
     }
 
@@ -54,5 +62,17 @@ public class TodoServlet extends HttpServlet {
         var writer = resp.getWriter();
         writer.print(List.of(json, email));
         writer.flush();
+    }
+
+    private List<Category> getCategories(JsonArray ids) {
+//        List<Category> categories = new ArrayList<>();
+//        for (int i = 0; i < ids.size(); i++) {
+//
+//        }
+        return IntStream
+                .range(0, ids.size())
+                .mapToObj(i -> ids.get(i))
+                .map(c -> HbnStore.instOf().findById(c.getAsInt()))
+                .collect(Collectors.toList());
     }
 }

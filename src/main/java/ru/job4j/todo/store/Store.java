@@ -1,5 +1,6 @@
 package ru.job4j.todo.store;
 
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 import ru.job4j.todo.model.UserItem;
 
@@ -16,5 +17,9 @@ public interface Store {
     UserItem getUserByEmail(String name);
 
     void saveOrUpdate(UserItem userItem);
+
+    Collection<Category> getAllCategories();
+
+    Category findById(int id);
 
 }
