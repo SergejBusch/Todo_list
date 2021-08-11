@@ -12,9 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -37,7 +36,7 @@ public class TodoServlet extends HttpServlet {
                 jsonObj.get("id").getAsInt(),
                 jsonObj.get("name").getAsString(),
                 jsonObj.get("description").getAsString(),
-                new Timestamp(System.currentTimeMillis()),
+                new Date(System.currentTimeMillis()),
                 jsonObj.get("done").getAsBoolean(),
                 (UserItem) req.getSession().getAttribute("user"),
                 array);
